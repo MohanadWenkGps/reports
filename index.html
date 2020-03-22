@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="/js/index.js"></script>   
+<script src="/js/helper/cookie.js"></script>   
+<script src="/js/helper/helper.js"></script>   
+<script src="/js/report.js"></script>   
+
+<head>
+    <title>page2</title>
+</head>
+<body onload="loading()">
+<p id="demo">hello mohanad page2</p>
+<div>
+    <label>Choose report: </label>
+    <select id="reportNames" name="reports"></select>
+</div>
+<div>
+    <label>Choose object: </label>
+    <select id="objectNames" name="objects"></select>
+</div>
+<div>
+    <label for="dateFrom">from:</label>
+    <input type="datetime-local" id="fromDate" name="fromDateChooser"> 
+    <br>
+    <label for="dateTo">To:</label>
+    <input type="datetime-local" id="toDate" name="toDateChooser"> 
+    <input type="submit" onclick="_executeReport()">
+</div>
+<br>
+<br>
+<div id = "tablesDiv">
+
+</div>
+</body>
+</html>                            
