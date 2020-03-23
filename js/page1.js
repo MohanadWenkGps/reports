@@ -5,7 +5,7 @@ function loading() {
     var token = ref.substring(indexOfToken+lenOf)
     //alert("token is: " + token);
     document.getElementById("demo").innerHTML = token;
-    checkCookie("Token",token,6)
+    setCookie("Token",token,6)
  
     window.parent.location.replace("http://127.0.0.1:8002/index.html")
    //location.href = "/page2.html";
