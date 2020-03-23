@@ -14,18 +14,27 @@ function executeReport(sid,resId,reportId,itemId,from,to){
     })
     var response = makeRequest(sid,svc,params)
 
-    var stats = analyisReportResult(response).stats
+    var stats = response.reportResult.stats
     createTable(document.getElementById("tablesDiv"),stats,"statistic" )
 
-    var tables = analyisReportResult(response).tables
-    getAllRowsData(sid,tables)
+    var tables = response.reportResult.tables
+    console.log(analyseTables(sid,tables))
     console.log(response)
     return response;
 }
 
-function analyisReportResult(response){
-   return {"stats":response.reportResult.stats,
-    "tables": response.reportResult.tables}
+function analyseTables(sid,tables){
+    var eachTable = []    //tables = {label ="", headers = [] , rows = [] }
+    var i=0;
+    tables.forEach(tbl => {
+        eachTable.push({
+            "label": tbl.label,
+            "headers": tbl.header,
+            "rows": getRowData(sid,i,0,(tbl.rows - 1))
+        })
+        i++
+    });
+    return eachTable
 }
 
 function cleanReportResult(sid){
@@ -42,24 +51,22 @@ function createTable(parent,tblData,tblName){
     tbl.style.border = '1px solid black';
     for(var i = 0; i < tableLen; i++){
         var tr = tbl.insertRow();
-        console.log(tblData[i])
         for(var j = 0; j < tblData[0].length; j++){
                 var td = tr.insertCell();
                 td.appendChild(document.createTextNode(tblData[i][j]));
                 td.style.border = '1px solid black';
         }
     }
-    console.log(parent)
     parent.appendChild(tbl);
 }
 
-function getAllRowsData(sid , tables){
-    var i=0;
-    tables.forEach(element => {
-        getRowData(sid,i,element.rows - 1);
-        i++
-    });
-}
+// function getAllRowsData(sid , tables){
+//     var i=0;
+//     tables.forEach(element => {
+//         getRowData(sid,i,(element.rows - 1));
+//         i++
+//     });
+// }
 
 function createLabel(parent,lblText){
     var lbl = document.createElement("Label");
@@ -67,14 +74,16 @@ function createLabel(parent,lblText){
     parent.appendChild(lbl)
 }
 
-function getRowData(sid,tableIndex,lastRowIndex){
-    var svc= '',
+function getRowData(sid,tableIndex,fromIndex,toIndex){
+    var svc= 'report/get_result_rows',
     params = JSON.stringify({
 		"tableIndex":tableIndex,
-		"indexFrom":0,
-		"indexTo":lastRowIndex
+		"indexFrom":fromIndex,
+		"indexTo":toIndex
     })
+
     var response = makeRequest(sid,svc,params)
-    console.log(response);
+    // console.log('??????????')
+    // console.log(response);
     return response;
 }
