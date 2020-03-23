@@ -14,8 +14,8 @@ function loading() {
 
     keepSidValid(getCookie("sid"));
 
-    document.getElementById("demo").innerHTML = document.getElementById("demo").innerHTML + "     sid is: "+getCookie("sid") + 
-                                                "   resId: "+resourceId  + "   user id: "+uid;
+    // document.getElementById("demo").innerHTML = document.getElementById("demo").innerHTML + "     sid is: "+getCookie("sid") + 
+    //                                             "   resId: "+resourceId  + "   user id: "+uid;
     
     fillReportDropList(getReportsName(getCookie("sid"),resourceId));
     objectsNamesAndIds = getObjectNamesAndIds(getCookie("sid"))
