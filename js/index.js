@@ -3,6 +3,7 @@ var resourceId;
 var objectsNamesAndIds = []
 function loading() {
     // check token
+
     var token = getCookie("Token")
     if (token == "") location.replace("http://127.0.0.1:8002/login.html");
    
@@ -22,6 +23,8 @@ function loading() {
     fillObjectsDropList(objectsNamesAndIds)
 
     //createTable(document.getElementById("tablesDiv"),null,"abcs")
+    //loadExcel();
+    // window.parent.location.replace("http://127.0.0.1:8002/excelExample.html")
 }
 
 
@@ -76,6 +79,8 @@ function getObjectNamesAndIds(_sid){
 }
 
 function _executeReport(){
+    var x = {"a":1 , "b":2}
+    console.log(typeof(x))
     var reportList = document.getElementById("reportNames");
     var objectList = document.getElementById("objectNames");
     var itemIndex = objectList.selectedIndex;

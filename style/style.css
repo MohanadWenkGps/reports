@@ -2,3 +2,6 @@ html, body {
     overflow: auto;
 	height:100%;
 }
+div.small-font{
+    font-size: 13px;
+}

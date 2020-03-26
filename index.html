@@ -1,9 +1,29 @@
-<!DOCTYPE html>
+
 <html lang="en">
-<script src="/js/index.js"></script>   
-<script src="/js/helper/cookie.js"></script>   
-<script src="/js/helper/helper.js"></script>   
-<script src="/js/report.js"></script>   
+    <!-- for handsontable lib -->
+    <!-- <script src="/js/node_modules/handsontable/dist/handsontable.full.min.js"></script>
+    <link href="/js/node_modules/handsontable/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
+     -->
+    <!-- <script src="/js/node_modules/xlsx-style/dist/xlsx.full.min.js"></script>
+    <script src="/js/node_modules/xlsx/dist/xlsx.full.min.js"></script> -->
+    <!-- <script src="/js/node_modules/exceljs"></script> -->
+    <script src="/js/node_modules/file-saver/dist/FileSaver.js"></script>
+    <!-- <script src="/js/node_modules/exceljs/dist/exceljs.js"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.js"></script>
+    <script src="/js/node_modules/exceljs/dist/exceljs.js"></script> -->
+    <script src="/js/libs/xlsx-populate.min.js"></script> 
+
+    <script src="/js/helper/cookie.js"></script>   
+    <script src="/js/helper/helper.js"></script>   
+    <script src="/js/helper/excel.js"></script>   
+    <script src="/js/index.js"></script>   
+    <script src="/js/report.js"></script>   
+
+<!-- <script src ="/js/node_modules/graceful-fs/polyfills.js"></script>
+    <script src="exceljs.bare.js"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.js"></script>
+        <script src="exceljs.js"></script> -->
+        
 
 <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -15,7 +35,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     
-    <div class="container-fluid h-100">
+    <div class="container-fluid h-100 small-font">
         <div class="card">
             <div class="card-body">
               <h3>Report Page</h3>
@@ -42,53 +62,24 @@
                 </div>
                 <br>
                 <br>
-                <div>
-                    <table class="table table-hover">
-                        <thead>
-                          <tr>
-                            <th scope="col">tables</th> 
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>Mark</td>
-                          </tr>
-                          <tr>
-                            <td>Jacob</td>
-
-                          </tr>
-                          <tr>
-                            <td>Jacob</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                <button id="button-a" onclick="clickBtn()">create excel</button>
+                <br>
+                <br>
+                <div id="listOfTables" class="list-group">
+                    
                 </div>
             </div>
             <div class="col-xl-6 bg-purple">
                 <label>Tables</label>
-                <div id = "tablesDiv"></div>
+                <div id = "tablesDiv">
+
+                </div>
             </div>
            
         </div>
     </div>
    
+<div id="example"></div>
 
-    <!-- <div class="container-fluid h-100">
-        <div class="row justify-content-center h-100">
-          <div class="col-4 bg-red">
-            <div class="h-100 d-flex flex-column">
-              <div class="row justify-content-center bg-purple">
-                <div class="text-white">
-                  <div style="height:150px">ROW 1 - fixed height</div>
-                </div>
-              </div>
-              <div class="row justify-content-center bg-blue flex-grow-1">
-                <div class="text-white">ROW 2 - grow remaining height</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-8 bg-gray"></div>
-        </div>
-      </div> -->
 </body>
 </html>                            
