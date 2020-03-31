@@ -1,6 +1,3 @@
-// var workbook = new Excel.Workbook();
-// const ExcelJS = require('exceljs');
-
 function executeReport(sid,resId,reportId,itemId,from,to){
     cleanReportResult(sid)
     var svc = 'report/exec_report'
@@ -15,16 +12,17 @@ function executeReport(sid,resId,reportId,itemId,from,to){
             "flags": 0
         }
     })
+    console.log(params)
     var response = makeRequest(sid,svc,params)
-
-    var stats = response.reportResult.stats
-    createTable(document.getElementById("tablesDiv"),stats,"statistic" )
-    createButtonForList("statistic",-1,true)
-    var tables = response.reportResult.tables
-   // console.log(analyseTables(sid,tables))
-    getTablesNames(tables)
     console.log(response)
     return response;
+
+//     var stats = response.reportResult.stats
+//     createTable(document.getElementById("tablesDiv"),stats,"statistic" )
+//     createButtonForList("statistic",-1,true)
+//     var tables = response.reportResult.tables
+//    // console.log(analyseTables(sid,tables))
+//     getTablesNames(tables)
 }
 
 function getTablesNames(tables){
@@ -92,45 +90,64 @@ function createLabel(parent,lblText){
     parent.appendChild(lbl)
 }
 
-function getRowData(sid,tableIndex,fromIndex,toIndex){
-    var svc= 'report/get_result_rows',
+// function getRowData(sid,tableIndex,fromIndex,toIndex){
+//     var svc= 'report/get_result_rows',
+//     params = JSON.stringify({
+// 		"tableIndex":tableIndex,
+// 		"indexFrom":fromIndex,
+// 		"indexTo":toIndex
+//     })
+
+//     var response = makeRequest(sid,svc,params)
+//     return response;
+// }
+
+function getRowAndSubData(sid,tableIndex,fromIndex,toIndex){
+    var svc= 'report/select_result_rows',
     params = JSON.stringify({
 		"tableIndex":tableIndex,
-		"indexFrom":fromIndex,
-		"indexTo":toIndex
+		"config":{
+			"type":"range",
+			"data":{
+				"from":fromIndex,
+				"to":toIndex,
+				"level":1
+			}
+        }
     })
 
     var response = makeRequest(sid,svc,params)
     return response;
 }
 
-function createExcel(){
-// var wb = XLSX.utils.book_new();
-// wb.Props = {
-//         Title: "SheetJS Tutorial",
-//         Subject: "Test",
-//         Author: "Red Stapler",
-//         CreatedDate: new Date(2017,12,19)
-// };
+function analyseRowData(rowData){
+    // eachRow [index,unitName,numOfTrips fpr day 1 ,numOfTrips fpr day 2,numOfTrips fpr day 3 .....]
+    var _row = []
+    var count=1;
+    rowData.forEach(row =>{
+        var eachRow = [] 
+        for(var i=0;i<34;i++) eachRow.push('-')
 
-// wb.SheetNames.push("Test Sheet");
-// var ws_data = [['hello' , 'world'],[11,44]];
-// var ws = XLSX.utils.aoa_to_sheet(ws_data);
-// wb.Sheets["Test Sheet"] = ws;
-// var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
-// function s2ab(s) {
-
-//         var buf = new ArrayBuffer(s.length);
-//         var view = new Uint8Array(buf);
-//         for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-//         return buf;
-        
-// }
-
-//     saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'test.xlsx');
-
+        eachRow.splice(0,1,count)  //add sequence
+        eachRow.splice(1,1,row.c[1]) //add unit name
+        fillNumberOFTripsPerDays(eachRow,row.r)
+        _row.push(eachRow)
+        count++
+    })
+    console.log(_row)
+    return _row
 }
 
+function fillNumberOFTripsPerDays(eachRow,data){
+   // var tripsPerDays = []
+    data.forEach(element =>{
+        var timeStart = new Date(element.t1 *1000);
+        var day = timeStart.getDate()
+        eachRow.splice(day+1 ,1, element.d)
+    })
+    //console.log(eachRow)
+
+}
 
 function createButtonForList(name,id,active){
     var _class="";

@@ -7,11 +7,18 @@ function getWorkbook() {
 function generate(data,type) {
     return getWorkbook()
         .then(function (workbook) {
-            workbook.sheet(0).cell("A1").value(data);
+            var sheet =workbook.sheet(0)
+            sheet.cell("A1").value(data);
+            console.log('data length: '+data.length)
+            addRangeBorder(sheet,("A1:AH"+data.length))
+
+            //mergeRange(sheet,"C1:AF1","Report Name",true,14)
+            //sheet
+
             //workbook.sheet(0).cell("A2").style("fill","#ff0000")
-            fillCellsWithCondition(data,workbook.sheet(0))
-            mergeRang(workbook.sheet(0))
-            addBorder(workbook.sheet(0),7,2)
+            // fillCellsWithCondition(data,workbook.sheet(0))
+            // mergeRang(workbook.sheet(0))
+            //addBorder(workbook.sheet(0),7,2)
             // const r = workbook.sheet(0).range("A1:C3");
             // // Set all cell values to the same value:
             // r.value(5);
@@ -43,11 +50,10 @@ function generateExcel(data) {
 }
 
 function clickBtn(){
-    data = [
-        [10,2,3],
-        [4,40,14],
-        [11,8,9]
-    ]
+    data = dataPreparedToexcel
+    data.splice(0,0,headerData()[0])
+    console.log('????????')
+    console.log(data)
     generateExcel(data)
 }
 
@@ -89,15 +95,31 @@ var borderStyle ={"border": true,
 "borderStyle": "thin"
 }
 
-function mergeRang(sheet){
-    const range = sheet.range("D1:F3");
-    range.value("WenkGPS");
+function mergeRange(sheet,_range,text,hasBorder,_fonSize){
+    const range = sheet.range(_range);
+    range.value(text);
     range.merged(true)
-    range.style({horizontalAlignment: "center", verticalAlignment: "center"})
+    range.style({horizontalAlignment: "center",
+     verticalAlignment: "center",
+     blod : true ,
+     fontSize : _fonSize})
+    if(hasBorder) range.style(borderStyle)
+}
+
+function addRangeBorder(sheet,_range){
+    const range = sheet.range(_range);
     range.style(borderStyle)
 }
 
-function addBorder(sheet,row,col){
-    var cell = sheet.row(row).cell(col)
-    cell.style(borderStyle);
+function headerData(){
+    var headerCol = 34,
+    header = [], firstRow = []
+    firstRow.push('#')
+    firstRow.push('Name')
+    for(var i = 1;i<= 31;i++) firstRow.push(i)
+    firstRow.push('Total')
+    header.push(firstRow)
+    console.log(header)
+    return header
 }
+

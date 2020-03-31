@@ -1,36 +1,22 @@
 
 <html lang="en">
-    <!-- for handsontable lib -->
-    <!-- <script src="/js/node_modules/handsontable/dist/handsontable.full.min.js"></script>
-    <link href="/js/node_modules/handsontable/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
-     -->
-    <!-- <script src="/js/node_modules/xlsx-style/dist/xlsx.full.min.js"></script>
-    <script src="/js/node_modules/xlsx/dist/xlsx.full.min.js"></script> -->
-    <!-- <script src="/js/node_modules/exceljs"></script> -->
-    <script src="/js/node_modules/file-saver/dist/FileSaver.js"></script>
-    <!-- <script src="/js/node_modules/exceljs/dist/exceljs.js"></script> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.js"></script>
-    <script src="/js/node_modules/exceljs/dist/exceljs.js"></script> -->
-    <script src="/js/libs/xlsx-populate.min.js"></script> 
+    <script src="/vendors/xlsx-populate/xlsx-populate.min.js"></script> 
 
-    <script src="/js/helper/cookie.js"></script>   
-    <script src="/js/helper/helper.js"></script>   
-    <script src="/js/helper/excel.js"></script>   
-    <script src="/js/index.js"></script>   
-    <script src="/js/report.js"></script>   
+    <script src="/resources/js/helper/cookie.js"></script>   
+    <script src="/resources/js/helper/requests.js"></script>   
+    <script src="/resources/js/helper/requestHandler.js"></script>   
+    <script src="/resources/js/helper/excel.js"></script>   
+    <script src="/resources/js/index.js"></script>   
+    <script src="/resources/js/report.js"></script>   
 
-<!-- <script src ="/js/node_modules/graceful-fs/polyfills.js"></script>
-    <script src="exceljs.bare.js"></script> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.js"></script>
-        <script src="exceljs.js"></script> -->
-        
 
 <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="/style/style.css">
+    <link rel="stylesheet" href="/resources/css/style.css">
     <title>Reports</title>
+    <link rel="shortcut icon" href="/resources/images/wenkgps_logo.ico" type="image/x-icon" />
 </head>
-<body onload="loading()">
+<body >
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
@@ -38,30 +24,57 @@
     <div class="container-fluid h-100 small-font">
         <div class="card">
             <div class="card-body">
-              <h3>Report Page</h3>
+               <div class="w-100" >
+                    <h3 class="alignleft">Report Page</h3>
+                    <div class="alignRight">
+                        <h6 id="username"></h6>
+                        <a></a>
+                    </div>
+              </div>
             </div>
           </div>
         <div class="d-md-flex h-md-100 h-100">
-            <div class="col-md-4 h-md-100 pt-2" style="background-color: #ededed;">      
-                
-                <div class="">
-                    <label class="">Choose report: </label>
-                    <select class="" id="reportNames" name="reports"></select>
-                </div>
-                <div>
-                    <label>Choose object: </label>
-                    <select id="objectNames" name="objects"></select>
-                </div>
-                <div>
-                    <label for="dateFrom">from:</label>
-                    <input type="datetime-local" id="fromDate" name="fromDateChooser"> 
-                    <br>
-                    <label for="dateTo">To:</label>
-                    <input type="datetime-local" id="toDate" name="toDateChooser"> 
-                    <input type="submit" onclick="_executeReport()">
-                </div>
-                <br>
-                <br>
+            <div class="col-md-4 h-md-100 pt-2" style="background-color: #ededed;">
+                <table class="small-font">
+                    <tbody>
+                        <tr>
+                            <td class="pr-2">Choose resource:</td> 
+                            <td class="w-100">
+                                <select class="w-100" id="resourceNames" name="resources" onchange="fillReports()"></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="pr-2">Choose report:</td> 
+                            <td class="w-100">
+                                <select class="w-100" id="reportNames" name="reports" onchange="fillObjects(this)"></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Choose object:</td> 
+                            <td class="">
+                                <select id="objectNames" name="objects"></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>From:</td> 
+                            <td class="">
+                                <input type="datetime-local" id="fromDate" name="fromDateChooser"> 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>To:</td> 
+                            <td class="">
+                                <input type="datetime-local" id="toDate" name="toDateChooser"> 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="submit" onclick="_executeReport()">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>      
+               
                 <button id="button-a" onclick="clickBtn()">create excel</button>
                 <br>
                 <br>
@@ -78,8 +91,7 @@
            
         </div>
     </div>
-   
-<div id="example"></div>
+   <!-- <div onload="loading()"></div> -->
 
 </body>
 </html>                            

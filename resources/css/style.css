@@ -1,0 +1,16 @@
+html, body {
+    overflow: auto;
+	height:100%;
+}
+
+table.small-font{
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.alignleft {
+	float: left;
+}
+.alignright {
+	float: right;
+}
