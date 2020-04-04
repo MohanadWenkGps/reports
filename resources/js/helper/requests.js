@@ -12,6 +12,26 @@ function getSid(token,username){ //to get sid
     var responce = JSON.parse(httpGet(_link+'svc=token/login&params={"token": "'+token+'","operateAs":"'+username+'","fl":2}'))
     return responce.eid
 }
+function getAllResources(_sid){
+    return getSearchOfObjects(_sid,"avl_resource","*",0,0,(1+4+8192))
+}
+
+function getResourcesWithCreatorId(_sid,creatorId){
+    var result = getAllResources(_sid)
+    var resources = []
+    if(result.items.length > 0){
+        result.items.forEach(element =>{
+            if (element.bpact == creatorId) {
+                resources.push({
+                    "name":element.nm,
+                    "id":element.id,
+                    "reports":element.rep
+                })
+            }
+        })
+        return resources
+    }
+}
 
 function getResourceById(_sid,id){ // the responce get reports names and ids
     var svc = "core/search_item"
@@ -40,7 +60,7 @@ function getReportsTemplates(_sid,resourceId,reportsId){ //to get objects Ids
     return makeRequest(_sid,svc,params)
 }
 
-function getSearchOfObjects(_sid,objType,valueMask,fromIndex,toIndex){
+function getSearchOfObjects(_sid,objType,valueMask,fromIndex,toIndex,flags=1){
     var svc = 'core/search_items'
     var params = JSON.stringify({
            "spec": {
@@ -52,7 +72,7 @@ function getSearchOfObjects(_sid,objType,valueMask,fromIndex,toIndex){
             "or_logic": 1
         },
         "force": 1,
-        "flags": 1,
+        "flags": flags,
         "from": fromIndex,
         "to": toIndex
     });
@@ -93,4 +113,12 @@ function getUnitGroupNames(_sid,resourceId,reportsId){
                 "id":unitGroup.id })
     })
     return _listOfObjects
+}
+
+
+
+function signOut(_sid){
+    var svc = 'core/logout'
+    var params = '{}'
+    return makeRequest(_sid,svc,params)
 }

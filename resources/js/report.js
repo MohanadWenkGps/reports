@@ -1,4 +1,4 @@
-function executeReport(sid,resId,reportId,itemId,from,to){
+function getExecuteReport(sid,resId,reportId,itemId,from,to){
     cleanReportResult(sid)
     var svc = 'report/exec_report'
     var params = JSON.stringify({
@@ -14,7 +14,7 @@ function executeReport(sid,resId,reportId,itemId,from,to){
     })
     console.log(params)
     var response = makeRequest(sid,svc,params)
-    console.log(response)
+   // console.log(response)
     return response;
 
 //     var stats = response.reportResult.stats
@@ -120,7 +120,7 @@ function getRowAndSubData(sid,tableIndex,fromIndex,toIndex){
     return response;
 }
 
-function analyseRowData(rowData){
+function analyseRowData(rowData, callback){
     // eachRow [index,unitName,numOfTrips fpr day 1 ,numOfTrips fpr day 2,numOfTrips fpr day 3 .....]
     var _row = []
     var count=1;
@@ -134,8 +134,8 @@ function analyseRowData(rowData){
         _row.push(eachRow)
         count++
     })
-    console.log(_row)
-    return _row
+    callback(_row)
+    //return _row
 }
 
 function fillNumberOFTripsPerDays(eachRow,data){

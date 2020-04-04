@@ -1,22 +1,36 @@
 var uid,
  resourceId,
+ id_manager3 = 8943764,
  id_amana_baghdad = 16581331,
  user_baghdad_rent = 'baghdad-rent', //id is 16581330
  sidAmana ,
- reportsFlag = '2',
+ reportsFlag = 'custom',
+ listOfResources = [],
  listOfReports=[],
  listOfObjects=[],
- dataPreparedToexcel
+ dataPreparedToexcel,
+
+ //HTML elements
+ e_reportsList,
+ e_objectsList,
+ e_fromDatePicker,
+ e_toDatePicker,
+ e_executeReportBtn,
+ e_loadingDiv
+
 
  document.addEventListener('DOMContentLoaded', function() {
-    loading()
+    loading(() =>{
+        document.getElementById("loading").style.visibility = "hidden";
+        
+    })
  }, false);
 
 
 
-function loading() {
+function loading(callback) {
     // check token
-
+    defineElements()
     var token = getCookie("Token")
     if (token == "") location.replace("http://127.0.0.1:8002/login.html");
    
@@ -30,18 +44,61 @@ function loading() {
     sidAmana = getSid(getCookie("Token"),user_baghdad_rent)
     keepSidValid(sidAmana)
 
-    //listOfObjects = getAllUnitGroups(sidAmana)
-    var resources = getResourceById(getCookie("sid"),id_amana_baghdad);
-    fillResourceNames(resources)
-    fillReportDropList(resources)
-    //console.log(listOfObjects)
-    console.log(getUnitGroupIds(sidAmana,id_amana_baghdad,20))
-
-    document.getElementById("fromDate").defaultValue = "2020-01-01T01:00";
-    document.getElementById("toDate").defaultValue = "2020-01-02T01:00";
+    var response = getResourceById(getCookie("sid"),id_amana_baghdad);
+    // listOfResources = getResourcesWithCreatorId(getCookie('sid'),id_manager3)
+    // console.log(listOfResources)
+    console.log(response)
+    fillResourceNames(response)
+    fillReportDropList(response)
+    //fillReportDropList(getReportsNames(listOfResources,id_amana_baghdad))
+    _fillObjects(e_reportsList)
     
+    callback();
+
+    e_fromDatePicker.defaultValue = "2020-01-01T00:00";
+    e_toDatePicker.defaultValue = "2020-01-01T23:59";
+
+    // console.log(listOfResources)
 }
 
+function defineElements(){
+    e_resourcesList = document.getElementById("resourceNames")
+    e_reportsList = document.getElementById("reportNames")
+    e_objectsList = document.getElementById("objectNames")
+    e_fromDatePicker = document.getElementById("fromDate")
+    e_toDatePicker = document.getElementById("toDate")
+    e_executeReportBtn =document.getElementById("executBtn")
+    e_userLabel = document.getElementById("username")
+    e_loadingDiv = document.getElementById("loadingDiv")
+}
+
+// function getReportsNames(listOfResources,IdResource){
+//     var data = function(){
+//         var reps ;
+//         listOfResources.forEach(element =>{
+//             if(element.id == IdResource) reps = element.reports
+//         })
+//         return reps
+//     }
+//     console.log('data')
+//     console.log(data())
+//     var minReportList = [] //clear list of reports
+//     Object.keys(data()).map(key => {
+//             var option = document.createElement("option");
+//             option.text = data()[key].n;
+//             e_reportsList.add(option);
+//             minReportList.push({"name":data()[key].n,"id":data()[key].id})
+//     })
+//     return minReportList
+// }
+
+// function fillReportDropList(arr){
+//     arr.forEach(element =>{
+//         var option = document.createElement("option");
+//         option.text = element.name;
+//         e_reportsList.add(option);
+//     })
+// }
 
 function fillReportDropList(arr){
     var select = document.getElementById("reportNames");
@@ -51,36 +108,52 @@ function fillReportDropList(arr){
             var option = document.createElement("option");
             option.text = data[key].n;
             select.add(option);
-            
-            // listOfReports.push({"name":data[key].n,"id":data[key].id})
-            listOfReports.push({"name":data[key].n,"id":66})
+            listOfReports.push({"name":data[key].n,"id":data[key].id})
+            //listOfReports.push({"name":data[key].n,"id":66})
         }
     })
 }
 
 function fillObjectsDropList(arr){
-    var select = document.getElementById("objectNames");
     arr.forEach(element => {
         var option = document.createElement("option");
         option.text = element.name;
        // option.setAttribute("id",element.id)
-        select.add(option);
+       e_objectsList.add(option);
     });
 }
 
+function showLoadingSpinner(callback){
+    e_loadingDiv.removeAttribute("hidden");
+    callback()
+}
+
+function executeReport(callback){
+    var reportId= getItemId(listOfReports, getSelectedValue(e_reportsList)),
+    itemId = getItemId(listOfObjects, getSelectedValue(e_objectsList));
+
+    if(itemId > 0){
+    var response = getExecuteReport(sidAmana,id_amana_baghdad,reportId,itemId,getIntervals().fromTimeStamp,getIntervals().toTimeStamp)
+    if(response.reportResult.tables.length >0){
+        var rowsCount = response.reportResult.tables[0].rows 
+        var rowData =getRowAndSubData(sidAmana,0,0,rowsCount)
+        analyseRowData(rowData,_row =>{
+            generateExcelSheet(_row)
+        })
+    }
+    else alert('There is no report found')
+}else alert('You should choose object first')
+callback()
+}
 
 function _executeReport(){
-    var reportList = document.getElementById("reportNames");
-     objectList = document.getElementById("objectNames"),
-     reportId= getItemId(listOfReports, getSelectedValue(reportList)),
-     itemId = getItemId(listOfObjects, getSelectedValue(objectList));
-
-    var response = executeReport(sidAmana,id_amana_baghdad,reportId,itemId,getIntervals().fromTimeStamp,getIntervals().toTimeStamp)
-    var rowsCount = response.reportResult.tables[0].rows 
-    // console.log(response)
-    var rowData =getRowAndSubData(sidAmana,0,0,rowsCount)
-    dataPreparedToexcel = analyseRowData(rowData)
-    console.log(dataPreparedToexcel)
+    showLoadingSpinner(() =>{
+        setTimeout(()=>{
+            executeReport(()=>{
+                e_loadingDiv.hidden = true
+            })
+        },700)
+    })
 }
 
 function getSelectedValue(dropList){
@@ -88,10 +161,8 @@ function getSelectedValue(dropList){
 }
 
 function getIntervals(){
-    var from = document.getElementById("fromDate"),
-        to = document.getElementById("toDate");
-    var fromTimeStamp = new Date(from.value).getTime() / 1000,
-    toTimeStamp = new Date(to.value).getTime() / 1000;
+    var fromTimeStamp = new Date(e_fromDatePicker.value).getTime() / 1000,
+    toTimeStamp = new Date(e_toDatePicker.value).getTime() / 1000;
     return {fromTimeStamp, toTimeStamp}
 }
 
@@ -105,19 +176,25 @@ function getItemId(arr,itemName){
 }
 
 
-function fillResourceNames(arr){
-    //console.log(arr)
-    var resourceDropList = document.getElementById("resourceNames")
+// function fillResourceNames(arr){
+//     arr.forEach(resource =>{
+//         var option = document.createElement("option");
+//         option.text = resource.name;
+//         e_resourcesList.add(option);
+//     })
+// }
+
+function fillResourceNames(data){
+    // var resourceDropList = document.getElementById("resourceNames")
    // arr.item.forEach(resource =>{
         var option = document.createElement("option");
-        option.text = arr.item.nm;
-        resourceDropList.add(option);
+        option.text = data.item.nm;
+        e_resourcesList.add(option);
    // })
 }
 
 function setUsername(_username){
-    var user = document.getElementById("username")
-    user.innerHTML = _username
+    e_userLabel.innerHTML = _username
 }
 
 function toTimestamp(strDate){
@@ -146,13 +223,23 @@ function toTimestamp(strDate){
     // if(month == _month && day == _day) return true;
    }
 
-   function fillObjects(reportList){
-    var objectList = document.getElementById("objectNames"),
-    reportId= getItemId(listOfReports, getSelectedValue(reportList))
-    clearSelectOption(objectList)
+   function _fillObjects(reportList){
+    var reportId= getItemId(listOfReports, getSelectedValue(reportList))
+    clearSelectOption(e_objectsList)
 
     listOfObjects = getUnitGroupNames(sidAmana,id_amana_baghdad,reportId)
     fillObjectsDropList(listOfObjects)
+   }
+
+   function fillReports(resourceList){
+    var resourceId= getItemId(listOfResources, getSelectedValue(resourceList))
+    console.log('resourceId+'+resourceId)
+    clearSelectOption(e_reportsList)
+
+    listOfReports = getReportsNames(listOfResources,resourceId)
+    console.log(listOfReports)
+
+    fillReportDropList(listOfReports)
    }
 
    function clearSelectOption(select){
@@ -161,3 +248,48 @@ function toTimestamp(strDate){
       select.options[i] = null;
     }
    }
+
+   function clickSignOut(){
+      var response= signOut(getCookie('sid'))
+      if(response.error == 0 ) {
+          deleteCookie('Token')
+          deleteCookie('sid')
+          location.reload();
+          return false;
+      }
+   }
+
+   function generateExcelSheet(data){
+       console.log(data)
+    var excelDetails = {
+        excelTitle: 'Custom report '+(new Date().toLocaleString().replace(',','')).replace('/','-'),
+        reportName: getSelectedValue(e_reportsList),
+        groupName: getSelectedValue(e_objectsList),
+        fromDate: e_fromDatePicker.value,
+        toDate: e_toDatePicker.value,
+    }
+
+//     var data = [
+//   //  ["#", "Name", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, "Total"],
+//         [1, "طلال كامل- مرسيدس قلاب - 41163", 2, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     ,[2, "R 58146 - سامر حميد عباس - مارسيدس قلاب", 2, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     ,[3, "علاء رحمن - مرسيدس قلاب - 32567", 2, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     , [4, "محمد عبد العباس خضر - سكانيا قلاب - R 53905", 1, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     ,[5, "M 16030 - اسامة محمد حسن - مارسيدس قلاب", 1, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     ,[6, "محمد علي حسن-  مارسدس قلاب - 74291", 1, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     ,[7, "محمد احسان علي - مان لوري قلاب - R 39564", 1, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     , [8, "جاسم شياع - مرسيدس قلاب - K 31441", 1, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     , [9, "عامر محمد - مارسدس قلاب -W 19814", 1, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     ,[10, "N 13120 - عادل محمد حسن -مارسيدس قلاب", 1, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     , [11, "حسين كريم لفتة - مرسيدس قلاب - 66751", 1, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     , [12, "علي كريم لفتة - مارسيدس قلاب-3007", 1, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     , [13, "عادل محمد - مرسيدس قلاب - T 60419", 1, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     , [14, "احمد حميد - مارسيدس قلاب - A 66870", 1, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+//     ]
+
+    data.splice(0,0,headerData()[2])
+    data.splice(0,0,headerData()[1])
+    data.splice(0,0,headerData()[0])
+
+    generateExcel(data,excelDetails)
+}
