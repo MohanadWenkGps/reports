@@ -21,7 +21,7 @@ function generate(data,details,type) {
             setFormulaPerUnit(sheet,("AH4:AH"+data.length),"=SUM(C4:AG4)") 
             setFormulaPerUnit(sheet,("C"+(lastRow)+":AH"+(lastRow)),"=SUM(C4:C"+data.length+")")
             styleTable(sheet,("A3:AH"+lastRow),"A3:AH3",("A3:A"+lastRow))
-            sheet.cell("B"+lastRow).value("Total per day")
+            sheet.cell("B"+lastRow).value("المجموع اليومي")
             setBoldRange(sheet,'AH3:AH'+lastRow)
             setBoldRange(sheet,'A'+lastRow+':AH'+lastRow)
             colorCell(sheet,lastRow,34,'FFFF00')
@@ -175,17 +175,17 @@ function headerData(){
     for(var i = 1;i<= 31;i++) {
         thirdRow.push(i)
     }
-    thirdRow.push('Total')
+    thirdRow.push('المجموع الشهري')
 
     header.push(firstRow)
     header.push(secondRow)
     header.push(thirdRow)
-    console.log(header)
+
     return header
 }
 
 function setFormulaPerUnit(sheet,range,formula){
-    console.log(range)
+  //  console.log(range)
     var cellFormula = formula;       
     sheet.range(range).formula(cellFormula);
 }
@@ -199,7 +199,7 @@ function fitCellWidth(sheet,data){
             if (value === undefined) return max;
             return Math.max(max, value.toString().length);
         }, 0);
-        console.log("col: "+col +"  maxWidth: "+maxStringLength)
+        //console.log("col: "+col +"  maxWidth: "+maxStringLength)
         sheet.column(col).width(maxStringLength)
     }
 }
@@ -208,12 +208,7 @@ function setColWidth(sheet,data){
     for(var col=1; col <= data[1].length;col++){
         var width = 4
         if(col ==2) width=40
-            // width = sheet.range(1,col,data.length,col).reduce((max, cell) => {
-            //     const value = cell.value();
-            //     if (value === undefined) return max;
-            //     return Math.max(max, value.toString().length);
-            // }, 0);
-        else if(col == data[1].length) width = 6
+        else if(col == data[1].length) width = 13
         sheet.column(col).width(width)
     }
 }

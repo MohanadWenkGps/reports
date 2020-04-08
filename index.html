@@ -1,6 +1,9 @@
 
-<html lang="en">
+<html lang="ar-AR" dir="RTL">
     <script src="/vendors/xlsx-populate/xlsx-populate.min.js"></script> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
 
     <script src="/resources/js/helper/cookie.js"></script>   
     <script src="/resources/js/helper/requests.js"></script>   
@@ -11,6 +14,7 @@
 
 
 <head>
+    <meta charset="utf-8" />
     <title>Reports</title>
     <link rel="shortcut icon" href="/resources/images/wenkgps_logo.ico" type="image/x-icon" />
 
@@ -22,11 +26,10 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
-
+    -->
     <!-- bootstrap -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
@@ -57,50 +60,58 @@
                 <table class="small-font">
                     <tbody>
                         <tr>
-                            <td class="pr-2">Choose resource:</td> 
-                            <td class="w-100">
-                                <select class="w-100" id="resourceNames" placeholder="Resource name" name="resources"></select>
+                            <td class="pl-2">الحساب:</td> 
+                            <td class="">
+                                <select class="w-85" id="resourceNames" placeholder="Resource name" name="resources"></select>
                             </td>
                         </tr>
                         <tr>
-                            <td class="pr-2">Choose report:</td> 
-                            <td class="w-100">
-                                <select class="w-100" id="reportNames" name="reports" onchange="_fillObjects(this)"></select>
+                            <td class="">التقرير:</td> 
+                            <td class="">
+                                <select class="w-85" id="reportNames" name="reports" onchange="_fillObjects(this)"></select>
                             </td>
                         </tr>
                         <tr>
-                            <td>Choose object:</td> 
-                            <td class="w-100">
-                                <select class="w-100"  id="objectNames" name="objects" placeholder="Choose object">
-                                    <option>select an object</option>
+                            <td class="pl-2">المجموعة:</td> 
+                            <td class="">
+                                <select class="w-85"  id="objectNames" name="objects" placeholder="Choose object">
+                                    <option>لاتوجد مجموعات</option>
                                 </select>
                          
                             </td>
                         </tr>
                         <tr>
-                            <td>From:</td> 
+                            <td>من تاريخ:</td> 
                             <td class="">
-                                <input type="datetime-local" id="fromDate" name="fromDateChooser"> 
+                                <input class="w-85" type="datetime-local" id="fromDate" name="fromDateChooser"> 
                             </td>
                         </tr>
                         <tr>
-                            <td>To:</td> 
+                            <td>الى تاريخ:</td> 
                             <td class="">
-                                <input type="datetime-local" id="toDate" name="toDateChooser"> 
+                                <input class="w-85" type="datetime-local" id="toDate" name="toDateChooser"> 
                             </td>
                         </tr>
-                    </tbody>
+                      </tbody>
                 </table>      
                 <br>
-                <div>
-                    <button class="btn btn-secondary btn-sm alignleft" id="executBtn" type="submit" onclick="_executeReport()">
-                        <i class="fas fa-file-excel"></i> Execute report
-                    </button>
-                    <div id="loadingDiv" hidden>
-                        <span class="loader"></span>
-                        <span style="margin-left: 8px; margin-top: 3px;">loading</span>
+                
+                
+                <!-- <div class="alignRight" style="display: inline-block;">
+                    <div class="checkbox alignRight small-font">
+                        <label><input type="checkbox" value="">اظهار ارقام السيارات فقط</label>
                     </div>
-                </div>
+               -->
+                    <div>
+                        <button class="btn btn-secondary btn-sm alignRight" id="executBtn" type="submit" onclick="_executeReport()">
+                            <i class="fas fa-file-excel ml-2"></i> تنفيذ التقرير
+                        </button>
+                        <div id="loadingDiv" class="alignRight mr-3" hidden>
+                            <span class="loader"></span>
+                            <span id="waitingText" style="margin-left: 8px; margin-top: 3px;">جاري التحميل , يرجى الانتظار</span>
+                        </div>
+                    </div>
+                <!-- </div> -->
                 <!-- <button id="button-a" onclick="clickBtn()">create excel</button> -->
                 <br>
                 <br>

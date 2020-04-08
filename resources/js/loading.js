@@ -7,7 +7,7 @@ function loading() {
     //document.getElementById("demo").innerHTML = token;
     setCookie("Token",token,6)
     setTimeout(()=>{
-        window.parent.location.replace("http://127.0.0.1:8002/index.html")
+        window.parent.location.replace("index.html")
 
     },2000)
    //location.href = "/page2.html";

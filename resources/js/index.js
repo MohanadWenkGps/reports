@@ -29,31 +29,46 @@ var uid,
 
 
 function loading(callback) {
+    console.log(getNumFromStr("ajhasd8797aydh327egb"))
     // check token
     defineElements()
     var token = getCookie("Token")
-    if (token == "") location.replace("http://127.0.0.1:8002/login.html");
+    if (token == "") location.replace("login.html");
    
-    var res = getUserDetails(token);
-    setCookie("sid",res.sid,6)
-    resourceId = res.resourceId;
-    uid = res.id;
-    setUsername(res.username)
-    keepSidValid(getCookie("sid"));
-    
-    sidAmana = getSid(getCookie("Token"),user_baghdad_rent)
-    keepSidValid(sidAmana)
+    getUserDetails(token, res =>{
+        setCookie("sid",res.sid,6)
+        
+        resourceId = res.resourceId;
+        uid = res.id;
+        setUsername(res.username)
+        keepSidValid(getCookie("sid"));
+        setLocalization(getCookie("sid"),res=>{console.log(res)})
+        
+        
+        // getSid(getCookie("Token"),user_baghdad_rent, eid =>{
+        //     sidAmana = eid
+        //     keepSidValid(sidAmana)
 
-    var response = getResourceById(getCookie("sid"),id_amana_baghdad);
+            getResourceById(getCookie("sid"),id_amana_baghdad, response =>{
+                if(response.hasOwnProperty('item')){
+                     fillResourceNames(response)
+                     fillReportDropList(response)
+                     _fillObjects(e_reportsList)
+                 }else {
+                     alert('لا يمكن الوصول الى تقارير البلديات بصلاحيات حسابك, يرجى الدخول بأسم مستخدم اخر')
+                     clickSignOut()
+                    }
+                 callback();
+            });
+
+      //  })
+    });
     // listOfResources = getResourcesWithCreatorId(getCookie('sid'),id_manager3)
     // console.log(listOfResources)
-    console.log(response)
-    fillResourceNames(response)
-    fillReportDropList(response)
+   // console.log(response)
+
     //fillReportDropList(getReportsNames(listOfResources,id_amana_baghdad))
-    _fillObjects(e_reportsList)
     
-    callback();
 
     e_fromDatePicker.defaultValue = "2020-01-01T00:00";
     e_toDatePicker.defaultValue = "2020-01-01T23:59";
@@ -101,26 +116,30 @@ function defineElements(){
 // }
 
 function fillReportDropList(arr){
-    var select = document.getElementById("reportNames");
-    var data = arr.item.rep
-    Object.keys(data).map(key => {
-        if (data[key].n.indexOf(reportsFlag) > 1)   {
-            var option = document.createElement("option");
-            option.text = data[key].n;
-            select.add(option);
-            listOfReports.push({"name":data[key].n,"id":data[key].id})
-            //listOfReports.push({"name":data[key].n,"id":66})
-        }
-    })
+    if(arr.hasOwnProperty('item')){
+        var select = document.getElementById("reportNames");
+        var data = arr.item.rep
+        Object.keys(data).map(key => {
+            if (data[key].n.indexOf(reportsFlag) > 1)   {
+                var option = document.createElement("option");
+                option.text = data[key].n;
+                select.add(option);
+                listOfReports.push({"name":data[key].n,"id":data[key].id})
+                //listOfReports.push({"name":data[key].n,"id":66})
+            }
+        })
+    }else addEmptyOption(e_reportsList)
 }
 
 function fillObjectsDropList(arr){
-    arr.forEach(element => {
-        var option = document.createElement("option");
-        option.text = element.name;
-       // option.setAttribute("id",element.id)
-       e_objectsList.add(option);
-    });
+    if(arr.length > 0)
+        arr.forEach(element => {
+            var option = document.createElement("option");
+            option.text = element.name;
+        // option.setAttribute("id",element.id)
+        e_objectsList.add(option);
+        });
+    else addEmptyOption(e_objectsList)
 }
 
 function showLoadingSpinner(callback){
@@ -132,18 +151,38 @@ function executeReport(callback){
     var reportId= getItemId(listOfReports, getSelectedValue(e_reportsList)),
     itemId = getItemId(listOfObjects, getSelectedValue(e_objectsList));
 
-    if(itemId > 0){
-    var response = getExecuteReport(sidAmana,id_amana_baghdad,reportId,itemId,getIntervals().fromTimeStamp,getIntervals().toTimeStamp)
-    if(response.reportResult.tables.length >0){
-        var rowsCount = response.reportResult.tables[0].rows 
-        var rowData =getRowAndSubData(sidAmana,0,0,rowsCount)
-        analyseRowData(rowData,_row =>{
-            generateExcelSheet(_row)
+    if(reportId ==0 )alert('يرجى اختيار التقرير اولا')
+    else{
+        if(itemId > 0){
+            console.log('from: '+getIntervals().fromTimeStamp+'  To: '+getIntervals().toTimeStamp)
+        getExecuteReport(getCookie('sid'),id_amana_baghdad,reportId,itemId,getIntervals().fromTimeStamp,getIntervals().toTimeStamp,
+        response=>{
+            console.log(response)
+            if(response.reportResult.tables.length >0){
+                var rowsCount = response.reportResult.tables[0].rows 
+                getRowAndSubData(getCookie('sid'),0,0,rowsCount,rowData=>{
+                    analyseRowData(rowData,_row =>{
+                        // var unitNumbers = []
+                        // _row.forEach(row =>{
+                        //     var num = getNumFromStr(row[1])
+                        //     row[1]= num
+                        //     // unitNumbers.push(getNumFromStr(row[1]))
+                        // })
+                        // console.log(_row)
+                        generateExcelSheet(_row)
+    
+                    })
+                })
+            }
+            else alert('لا توجد نتائج , تأكد من المعطيات')
+            callback()
         })
+    }else {
+        alert('يرجى اختيار المجموعة اولا')
+        callback()
     }
-    else alert('There is no report found')
-}else alert('You should choose object first')
-callback()
+
+    }
 }
 
 function _executeReport(){
@@ -187,9 +226,12 @@ function getItemId(arr,itemName){
 function fillResourceNames(data){
     // var resourceDropList = document.getElementById("resourceNames")
    // arr.item.forEach(resource =>{
+      
         var option = document.createElement("option");
         option.text = data.item.nm;
         e_resourcesList.add(option);
+      
+
    // })
 }
 
@@ -227,18 +269,17 @@ function toTimestamp(strDate){
     var reportId= getItemId(listOfReports, getSelectedValue(reportList))
     clearSelectOption(e_objectsList)
 
-    listOfObjects = getUnitGroupNames(sidAmana,id_amana_baghdad,reportId)
-    fillObjectsDropList(listOfObjects)
+    getUnitGroupNames(getCookie('sid'),id_amana_baghdad,reportId, _listOfObjects=>{
+        listOfObjects = _listOfObjects
+        fillObjectsDropList(listOfObjects)
+    })
    }
 
    function fillReports(resourceList){
     var resourceId= getItemId(listOfResources, getSelectedValue(resourceList))
-    console.log('resourceId+'+resourceId)
     clearSelectOption(e_reportsList)
 
     listOfReports = getReportsNames(listOfResources,resourceId)
-    console.log(listOfReports)
-
     fillReportDropList(listOfReports)
    }
 
@@ -250,17 +291,17 @@ function toTimestamp(strDate){
    }
 
    function clickSignOut(){
-      var response= signOut(getCookie('sid'))
-      if(response.error == 0 ) {
-          deleteCookie('Token')
-          deleteCookie('sid')
-          location.reload();
-          return false;
-      }
+    signOut(getCookie('sid'), response=>{
+        if(response.error == 0 ) {
+            deleteCookie('Token')
+            deleteCookie('sid')
+            location.reload();
+            return false;
+        }
+    })
    }
 
    function generateExcelSheet(data){
-       console.log(data)
     var excelDetails = {
         excelTitle: 'Custom report '+(new Date().toLocaleString().replace(',','')).replace('/','-'),
         reportName: getSelectedValue(e_reportsList),
@@ -292,4 +333,15 @@ function toTimestamp(strDate){
     data.splice(0,0,headerData()[0])
 
     generateExcel(data,excelDetails)
+}
+
+function addEmptyOption(parent){
+    var option = document.createElement("option");
+    option.text = 'لايوجد';
+    parent.add(option);
+}
+
+function getNumFromStr(str){
+    var numbers = str.match(/\d+/g).map(Number);
+    return numbers[0]
 }

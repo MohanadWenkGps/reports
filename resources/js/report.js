@@ -1,5 +1,5 @@
-function getExecuteReport(sid,resId,reportId,itemId,from,to){
-    cleanReportResult(sid)
+function getExecuteReport(sid,resId,reportId,itemId,from,to,callbackSuccess){
+    cleanReportResult(sid,res=>{if(res.error ==0) console.log('!!!report cleaned')})
     var svc = 'report/exec_report'
     var params = JSON.stringify({
         "reportResourceId": resId,
@@ -12,10 +12,8 @@ function getExecuteReport(sid,resId,reportId,itemId,from,to){
             "flags": 0
         }
     })
-    console.log(params)
-    var response = makeRequest(sid,svc,params)
-   // console.log(response)
-    return response;
+    makeRequest(sid,svc,params,res=>{callbackSuccess(res)})
+
 
 //     var stats = response.reportResult.stats
 //     createTable(document.getElementById("tablesDiv"),stats,"statistic" )
@@ -53,10 +51,10 @@ function getTablesNames(tables){
 //     return eachTable
 // }
 
-function cleanReportResult(sid){
+function cleanReportResult(sid,callbackSuccess){
     var svc='report/cleanup_result'
     var params = JSON.stringify({});
-    makeRequest(sid,svc,params);
+    makeRequest(sid,svc,params,res=>callbackSuccess(res));
 }
 
 function createTable(parent,tblData,tblName){
@@ -102,7 +100,7 @@ function createLabel(parent,lblText){
 //     return response;
 // }
 
-function getRowAndSubData(sid,tableIndex,fromIndex,toIndex){
+function getRowAndSubData(sid,tableIndex,fromIndex,toIndex,callbackSuccess){
     var svc= 'report/select_result_rows',
     params = JSON.stringify({
 		"tableIndex":tableIndex,
@@ -116,8 +114,8 @@ function getRowAndSubData(sid,tableIndex,fromIndex,toIndex){
         }
     })
 
-    var response = makeRequest(sid,svc,params)
-    return response;
+    makeRequest(sid,svc,params,callbackSuccess)
+
 }
 
 function analyseRowData(rowData, callback){
